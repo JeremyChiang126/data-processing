@@ -1,0 +1,83 @@
+#读取数据
+import os
+os.chdir(r'C:\Users\98141\Desktop' )
+f = open('商铺数据.csv','r',encoding = 'utf8')
+for i in f.readlines()[:5]:
+    print(i.split(',')[-1].split('                                '))
+    
+f.seek(0) 
+
+#清洗数据
+
+def fcm(s):
+    if '条' in s:
+        return(int(s.split(' ')[0]))
+    else:
+        return('缺失数据')
+
+def fpr(s):
+    if '￥' in s:
+        return(int(s.split('￥')[-1]))
+    else:
+        return('缺失数据')
+
+def fcl(s):
+    if len(s) == 3:
+        quality = float(s[0][2:])
+        envi = float(s[1][2:])
+        service = float(s[2][2:])
+        return([quality,envi,service])
+    else:
+        return('缺失数据')
+        
+for i in f.readlines()[:10]:
+    cl = fcl(i.split(',')[-1].split('                                '))
+    print(cl)
+    
+    #数据清洗
+
+datalst = []
+
+f.seek(0)
+n=0
+
+for i in f.readlines()[1:20]:
+    data = i.split(',')
+    #print(i.split(','))
+    classify = data[0]
+    name = data[1]
+    com_count = fcm(data[2])
+    star = data[3]
+    price = fpr(data[4])
+    add =data[5]
+    qua = fcl(data[-1].split('                                '))[0]
+    env = fcl(data[-1].split('                                '))[1]
+    service = fcl(data[-1].split('                                '))[2]
+    
+    print(com_count,star,price,add,env,service)
+    
+    if '缺失数据' not in [com_count,price,qua]:
+        n += 1
+        data_lst2 = [['classify',classify],
+                     ['name',name],
+                     ['star',star],
+                     ['price',price],
+                     ['address',add],
+                     ['quality',qua],
+                     ['enviroment',env],
+                     ['service',service]]
+        #print(data_lst2)
+        datalst.append(dict(data_lst2))
+        print('成功读取%i条数据：' %n)
+    else:
+        continue
+f.close()
+print(datalst)
+print('读取完成，总共加载%i条数据' %n)
+
+import pickle
+
+pic = open(r'C:\Users\98141\Desktop\data.pkl','wb')
+pickle.dump(datalst,pic)
+pic.close()
+print('完成')

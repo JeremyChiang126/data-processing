@@ -1,0 +1,20 @@
+from multiprocessing import Process
+import os
+
+
+def func():
+    global n  # 声明一个全局变量
+    n = 0       # 重新定义一个n
+    print('pid: %s' % os.getpid(), n)
+
+
+if __name__ == '__main__':
+    n = 100
+    p = Process(target=func)
+    p.start()
+    p.join()
+    print(os.getpid(), n)
+
+    
+# 主进程与子进程数据隔离
+# 进程间数据完全隔离

@@ -1,0 +1,19 @@
+from multiprocessing import Pipe, Process
+
+
+def func(conn):
+    while True:
+        msg = conn.recv()
+        if msg is None:
+            break
+        print(msg)
+
+
+if __name__ == '__main__':
+    conn1, conn2 = Pipe()
+    Process(target=func, args=(conn1,)).start()
+
+    for i in range(20):
+        conn2.send('hello')
+
+    conn2.send(None)

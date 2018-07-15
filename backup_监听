@@ -1,0 +1,27 @@
+from web3.auto import w3
+import time
+from Bida_block.data_processing import convert_block_data
+
+
+# 传入单个转账时间，data返回至kafka_main
+def handle_event(event):
+    data = convert_block_data(event)
+    return data
+
+
+# 监听时间循环
+def log_loop(event_filter, poll_interval):
+    while True:
+        for event in event_filter.get_new_entries():
+            handle_event(event)
+        time.sleep(poll_interval)
+
+
+# 转账事件实时监听
+def capture_event(address, end_number):
+    block_filter = w3.eth.filter({'fromBlock': end_number, 'address': address})
+    log_loop(block_filter, 2)
+
+address = "0xd850942ef8811f2a866692a623011bde52a462c1"
+end_number = 5962645
+print(capture_event(address,end_number))
